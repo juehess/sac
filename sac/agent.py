@@ -71,26 +71,30 @@ class Agent():
         if self.memory.mem_cntr < self.batch_size:
             return
 
+        #retrieve batch of samples from buffer
         state, action, reward, new_state, done = self.memory.sample_buffer(self.batch_size)
-
         reward = T.tensor(reward, dtype=T.float32).to(self.critic_1.device)
         done = T.tensor(done, dtype=T.bool).to(self.critic_1.device)
         state_ = T.tensor(new_state, dtype=T.float32).to(self.critic_1.device)
         state = T.tensor(state, dtype=T.float32).to(self.critic_1.device)
         action = T.tensor(action, dtype=T.float32).to(self.critic_1.device)
 
+        #get value of current and future state
         value = self.value(state).view(-1) # scalar quantity of values: we can collapse the tensor along batch dimension
         value_ = self.target_value(state_).view(-1)
         value_[done] = 0 #value of terminal states in zero
 
-        #Value loss
+        #retrieve an action
         actions, log_probs = self.actor.sample_normal(state, reparameterize=False) # retrieve an action
         #log_probs = log_probs.view(-1)
         #actions = actions.view(-1)
+
+        #predict the q value for the current state and sampled action
         q1_new_policy = self.critic_1.forward(state, actions) # get action value from both critics
         q2_new_policy = self.critic_2.forward(state, actions)
         critic_value = T.min(q1_new_policy, q2_new_policy) # choose the minimum to not become overconfident
 
+        #update the value function with the difference between the current value and the predicted value of the critic
         self.value.optimizer.zero_grad()
         value_target = critic_value.view(-1) - log_probs.view(-1)
         # the value loss is difference (mse) between current and target value

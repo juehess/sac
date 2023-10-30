@@ -1,8 +1,8 @@
+#import gym
+#import pybullet_envs
+import pybulletgym
 import gym
-import pybullet_envs
-#import pybulletgym
-import gym
-env_name = 'HumanoidPyBulletEnv-v0'
+env_name = 'InvertedPendulumSwingupPyBulletEnv-v0'
 env = gym.make(env_name)
 
 env.render()

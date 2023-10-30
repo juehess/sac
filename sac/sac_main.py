@@ -1,11 +1,12 @@
 import pybullet_envs
 import gym
+import pybulletgym
 import numpy as np
 from agent import Agent
 from utilities import plot_learning_curve
 
 if __name__ == '__main__':
-    env_id = 'InvertedPendulumSwingupBulletEnv-v0'
+    env_id = 'InvertedPendulumSwingupPyBulletEnv-v0'
 
     env = gym.make(env_id)
     input_dims = env.observation_space.shape
